@@ -1,4 +1,5 @@
 #include <string>
+#include <fstream>
 #include <vector>
 #include <switch.h>
 #include <sys/stat.h>
@@ -31,6 +32,7 @@ int main(int argc, const char *argv[])
 
         if(down & KEY_A)
         {
+            infoCons.out(sysFont, "Beginning update dump.");
             FsFileSystem sys;
             fsOpenBisFileSystem(&sys, 31, "");
             fsdevMountDevice("sys", sys);
@@ -42,6 +44,7 @@ int main(int argc, const char *argv[])
             copyDirToDir("sys:/Contents/", "sdmc:/Update/");
 
             fsdevUnmountDevice("sys");
+            infoCons.out(sysFont, "Update dump finished. Open 'sdmc:/Update/'' in ChoiDujourNX to update!");
         }
         else if(down & KEY_PLUS)
             break;

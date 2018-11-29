@@ -17,7 +17,7 @@ class console
 
             for(unsigned i = 0; i < lines.size(); i++)
             {
-                drawText(lines[i].c_str(), frameBuffer, f, 30, 98 + (i * 20), 16, clrCreateU32(0xFFFFFFFF));
+                drawText(lines[i].c_str(), frameBuffer, f, 38, 98 + (i * 20), 16, clrCreateU32(0xFFFFFFFF));
             }
 
             gfxHandleBuffs();

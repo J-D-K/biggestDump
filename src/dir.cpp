@@ -82,7 +82,6 @@ void copyFile(const std::string& from, const std::string& to)
     f.seekg(0, f.beg);
 
     uint8_t *buff = new uint8_t[0x80000];
-    infoCons.out(sysFont, "Copying " + from + "...");
     for(unsigned i = 0; i < fileSize; )
     {
         f.read((char *)buff, 0x80000);
@@ -100,6 +99,9 @@ void copyFile(const std::string& from, const std::string& to)
 void copyDirToDir(const std::string& from, const std::string& to)
 {
     dirList list(from);
+    char countStr[8];
+    sprintf(countStr, "%u", list.getCount());
+    infoCons.out(sysFont, std::string("\"" + from + "\" opened. " + countStr + " items found."));
 
     for(unsigned i = 0; i < list.getCount(); i++)
     {
@@ -111,16 +113,16 @@ void copyDirToDir(const std::string& from, const std::string& to)
             newTo += "/";
 
             copyDirToDir(newFrom, newTo);
+            infoCons.out(sysFont, "Finished with \"" + list.getItem(i) + "\"!");
         }
         else
         {
             std::string fullFrom = from + list.getItem(i);
             std::string fullTo   = to   + list.getItem(i);
-
+            infoCons.out(sysFont, "Copying \"" + list.getItem(i) + "\"...");
             copyFile(fullFrom, fullTo);
         }
     }
-    infoCons.out(sysFont, "Done!");
 }
 
 void delDir(const std::string& path)

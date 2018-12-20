@@ -19,10 +19,11 @@ int main(int argc, const char *argv[])
     sysFont = fontLoadSharedFonts();
 
     texClearColor(frameBuffer, clrCreateU32(0xFF2D2D2D));
-    drawText("biggestDump", frameBuffer, sysFont, 64, 38, 24, clrCreateU32(0xFFFFFFFF));
+    drawText("biggestDump", frameBuffer, sysFont, 64, 38, 24);
     drawRect(frameBuffer, 30, 87, 1220, 1, clrCreateU32(0xFFFFFFFF));
     drawRect(frameBuffer, 30, 648, 1220, 1, clrCreateU32(0xFFFFFFFF));
-    infoCons.out(sysFont, "Press A to Dump to \"sdmc:/Update/\", Plus to Exit");
+    infoCons.out(sysFont, "Press A to Dump to #sdmc:/Update/#, X to Erase pending update, Plus to Exit");
+    infoCons.nl();
 
     while(appletMainLoop())
     {
@@ -32,19 +33,35 @@ int main(int argc, const char *argv[])
 
         if(down & KEY_A)
         {
-            infoCons.out(sysFont, "Beginning update dump.");
             FsFileSystem sys;
             fsOpenBisFileSystem(&sys, 31, "");
             fsdevMountDevice("sys", sys);
 
+            infoCons.out(sysFont, "Beginning Firmware dump.");
+            infoCons.nl();
+
             //del first for clean dump lol
-            delDir("sdmc:/Update/");
+            delDir("sdmc:/Update/", false);
             mkdir("sdmc:/Update", 777);
 
             copyDirToDir("sys:/Contents/", "sdmc:/Update/");
 
             fsdevUnmountDevice("sys");
-            infoCons.out(sysFont, "Update dump finished. Open 'sdmc:/Update/'' in ChoiDujourNX to update!");
+            infoCons.out(sysFont, "Update dump finished. Open #sdmc:/Update/# in ChoiDujourNX to update.");
+            infoCons.nl();
+        }
+        else if(down & KEY_X)
+        {
+            FsFileSystem sys;
+            fsOpenBisFileSystem(&sys, 31, "");
+            fsdevMountDevice("sys", sys);
+
+            infoCons.out(sysFont, "Deleting pending update.");
+            infoCons.nl();
+            delDir("sys:/Contents/placehld/", true);
+            infoCons.out(sysFont, "Update deletion finished.");
+            infoCons.nl();
+            fsdevUnmountDevice("sys");
         }
         else if(down & KEY_PLUS)
             break;

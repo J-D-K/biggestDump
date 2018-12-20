@@ -24,4 +24,4 @@ class dirList
 
 void copyFile(const std::string& from, const std::string& to);
 void copyDirToDir(const std::string& from, const std::string &to);
-void delDir(const std::string& path);
+void delDir(const std::string& path, bool output);

@@ -4,6 +4,8 @@
 #include <vector>
 #include <dirent.h>
 
+#include "cons.h"
+
 class dirList
 {
     public:
@@ -22,6 +24,6 @@ class dirList
         std::vector<std::string> item;
 };
 
-void copyFile(const std::string& from, const std::string& to);
-void copyDirToDir(const std::string& from, const std::string &to);
-void delDir(const std::string& path, bool output);
+void copyFile(const std::string& from, const std::string& to, console *c);
+void copyDirToDir(const std::string& from, const std::string &to, console *c);
+void delDir(const std::string& path, bool output, console *c);

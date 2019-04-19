@@ -65,21 +65,21 @@ unsigned dirList::getCount()
     return item.size();
 }
 
-void copyFile(const std::string& from, const std::string& to)
+void copyFile(const std::string& from, const std::string& to, console *c)
 {
     std::fstream f(from, std::ios::in | std::ios::binary);
     std::fstream t(to, std::ios::out | std::ios::binary);
 
     if(!f.is_open())
     {
-        infoCons.out(sysFont, std::string("    *ERROR* Opening #" + from + "# for reading!"));
-        infoCons.nl();
+        c->out(std::string("    *ERROR* Opening #" + from + "# for reading!"));
+        c->nl();
         return;
     }
     else if(!t.is_open())
     {
-        infoCons.out(sysFont, std::string("    *ERROR* Opening #" + to + "# for writing!"));
-        infoCons.nl();
+        c->out(std::string("    *ERROR* Opening #" + to + "# for writing!"));
+        c->nl();
         return;
     }
 
@@ -89,7 +89,7 @@ void copyFile(const std::string& from, const std::string& to)
 
     char tmp[32];
     sprintf(tmp, "%luKB.", fileSize / 1024);
-    infoCons.out(sysFont, " *Size*: " + std::string(tmp));
+    c->out(" *Size*: " + std::string(tmp));
 
     uint8_t *buff = new uint8_t[0x80000];
     for(unsigned i = 0; i < fileSize; )
@@ -105,9 +105,9 @@ void copyFile(const std::string& from, const std::string& to)
         {
             char errorMess[128];
             sprintf(errorMess, "    *ERROR:* Read/Write mismatch. %lu/%lu.", f.gcount(), writeSize);
-            infoCons.nl();
-            infoCons.out(sysFont, errorMess);
-            infoCons.nl();
+            c->nl();
+            c->out(errorMess);
+            c->nl();
         }
 
         i += f.gcount();
@@ -119,7 +119,7 @@ void copyFile(const std::string& from, const std::string& to)
     t.close();
 }
 
-void copyDirToDir(const std::string& from, const std::string& to)
+void copyDirToDir(const std::string& from, const std::string& to, console *c)
 {
     dirList list(from);
     char countStr[12];
@@ -129,8 +129,8 @@ void copyDirToDir(const std::string& from, const std::string& to)
         dirCount = list.getCount() - 1;
 
     sprintf(countStr, "%u", dirCount);
-    infoCons.out(sysFont, std::string("#" + from + "# opened. ^" + countStr + "^ items found."));
-    infoCons.nl();
+    c->out(std::string("#" + from + "# opened. ^" + countStr + "^ items found."));
+    c->nl();
 
     for(unsigned i = 0; i < list.getCount(); i++)
     {
@@ -141,9 +141,9 @@ void copyDirToDir(const std::string& from, const std::string& to)
             mkdir(newTo.c_str(), 0777);
             newTo += "/";
 
-            copyDirToDir(newFrom, newTo);
-            infoCons.out(sysFont, "Finished with #" + from + list.getItem(i) + "#!");
-            infoCons.nl();
+            copyDirToDir(newFrom, newTo, c);
+            c->out("Finished with #" + from + list.getItem(i) + "#!");
+            c->nl();
         }
         else
         {
@@ -152,15 +152,15 @@ void copyDirToDir(const std::string& from, const std::string& to)
             char outLine[256];
             sprintf(outLine, "Copying %%%s%% (%03d/%03d)... ", list.getItem(i).c_str(), i, list.getCount() - 1);
 
-            infoCons.out(sysFont, outLine);
-            copyFile(fullFrom, fullTo);
-            infoCons.out(sysFont, "    ^Done^!");
-            infoCons.nl();
+            c->out(outLine);
+            copyFile(fullFrom, fullTo, c);
+            c->out("    ^Done^!");
+            c->nl();
         }
     }
 }
 
-void delDir(const std::string& path, bool output)
+void delDir(const std::string& path, bool output, console *c)
 {
     dirList list(path);
     for(unsigned i = 0; i < list.getCount(); i++)
@@ -168,7 +168,7 @@ void delDir(const std::string& path, bool output)
         if(list.isDir(i))
         {
             std::string newPath = path + list.getItem(i) + "/";
-            delDir(newPath, false);
+            delDir(newPath, false, c);
 
             std::string delPath = path + list.getItem(i);
             rmdir(delPath.c_str());
@@ -177,20 +177,20 @@ void delDir(const std::string& path, bool output)
         {
             std::string delPath = path + list.getItem(i);
             if(output)
-                infoCons.out(sysFont, "Deleting %" + list.getItem(i) + "%...");
+                c->out("Deleting %" + list.getItem(i) + "%...");
             if(std::remove(delPath.c_str()) == 0)
             {
                 if(output)
-                    infoCons.out(sysFont, "    ^Done^!");
+                    c->out("    ^Done^!");
             }
             else
             {
                 if(output)
-                    infoCons.out(sysFont, "    *Failed*.");
+                    c->out("    *Failed*.");
             }
 
             if(output)
-                infoCons.nl();
+                c->nl();
         }
     }
 

@@ -8,8 +8,11 @@
 #include "gfx.h"
 
 tex *frameBuffer;
+clr textClr;
 
-clr textColor;
+static NWindow *window;
+static Framebuffer fb;
+static bool framestarted = false;
 
 static inline uint32_t blend(const clr px, const clr fb)
 {
@@ -37,23 +40,30 @@ static inline uint32_t smooth(const clr px1, const clr px2)
     return (fA << 24 | fB << 16 | fG << 8 | fR);
 }
 
+static inline bool yCheck(const tex *target, int y)
+{
+    return y < 0 || y >= target->height;
+}
+
+static inline bool xCheck(const tex *target, int x)
+{
+    return x < 0 || x >= target->width;
+}
+
 bool graphicsInit(int windowWidth, int windowHeight)
 {
-    gfxInitResolution((uint32_t)windowWidth, (uint32_t)windowHeight);
-    gfxInitDefault();
-    plInitialize();
-    consoleInit(NULL);
+    window = nwindowGetDefault();
+    nwindowSetDimensions(window, windowWidth, windowHeight);
 
-    gfxSetMode(GfxMode_LinearDouble);
+    framebufferCreate(&fb, window, windowWidth, windowHeight, PIXEL_FORMAT_RGBA_8888, 2);
+    framebufferMakeLinear(&fb);
+    plInitialize();
 
     //Make a fake tex that points to framebuffer
     frameBuffer = malloc(sizeof(tex));
     frameBuffer->width = windowWidth;
     frameBuffer->height = windowHeight;
-    frameBuffer->data = (uint32_t *)gfxGetFramebuffer(NULL, NULL);
     frameBuffer->size = windowWidth * windowHeight;
-
-    textColor = clrCreateU32(0xFFFFFFFF);
 
     return true;
 }
@@ -63,16 +73,28 @@ bool graphicsExit()
     free(frameBuffer);
 
     plExit();
-    gfxExit();
+    framebufferClose(&fb);
+    nwindowClose(window);
 
     return true;
 }
 
-void gfxHandleBuffs()
+void gfxBeginFrame()
 {
-    gfxFlushBuffers();
-    gfxSwapBuffers();
-    gfxWaitForVsync();
+    if(!framestarted)
+    {
+        frameBuffer->data = (uint32_t *)framebufferBegin(&fb, NULL);
+        framestarted = true;
+    }
+}
+
+void gfxEndFrame()
+{
+    if(framestarted)
+    {
+        framebufferEnd(&fb);
+        framestarted = false;
+    }
 }
 
 static void drawGlyph(const FT_Bitmap *bmp, tex *target, int _x, int _y)
@@ -83,18 +105,18 @@ static void drawGlyph(const FT_Bitmap *bmp, tex *target, int _x, int _y)
     uint8_t *bmpPtr = bmp->buffer;
     for(int y = _y; y < _y + bmp->rows; y++)
     {
-        if(y > target->height || y < 0)
+        if(yCheck(target, y))
             continue;
 
         uint32_t *rowPtr = &target->data[y * target->width + _x];
         for(int x = _x; x < _x + bmp->width; x++, bmpPtr++, rowPtr++)
         {
-            if(x > target->width || x < 0)
+            if(xCheck(target, x))
                 continue;
 
             if(*bmpPtr > 0)
             {
-                clr txClr = clrCreateRGBA(textColor.r, textColor.g, textColor.b, *bmpPtr);
+                clr txClr = clrCreateRGBA(textClr.r, textClr.g, textClr.b, *bmpPtr);
                 clr tgtClr = clrCreateU32(*rowPtr);
 
                 *rowPtr = blend(txClr, tgtClr);
@@ -134,11 +156,12 @@ static inline FT_GlyphSlot loadGlyph(const uint32_t c, const font *f, FT_Int32 f
     return NULL;
 }
 
-void drawText(const char *str, tex *target, const font *f, int x, int y, int sz)
+void drawText(const char *str, tex *target, const font *f, int x, int y, int sz, clr c)
 {
     int tmpX = x;
     uint32_t tmpChr = 0;
     ssize_t unitCnt = 0;
+    textClr = c;
 
     resizeFont(f, sz);
 
@@ -162,10 +185,10 @@ void drawText(const char *str, tex *target, const font *f, int x, int y, int sz)
 
             case '%':
                 {
-                    if(clrGetColor(textColor) == 0xFF00FFFF)
-                        textColor = clrCreateU32(0xFFFFFFFF);
+                    if(clrGetColor(textClr) == 0xFF00FFFF)
+                        textClr = clrCreateU32(0xFFFFFFFF);
                     else
-                        textColor = clrCreateU32(0xFF00FFFF);
+                        textClr = clrCreateU32(0xFF00FFFF);
 
                     continue;
                 }
@@ -173,10 +196,10 @@ void drawText(const char *str, tex *target, const font *f, int x, int y, int sz)
 
             case '^':
                 {
-                    if(clrGetColor(textColor) == 0xFF00FF00)
-                        textColor = clrCreateU32(0xFFFFFFFF);
+                    if(clrGetColor(textClr) == 0xFF00FF00)
+                        textClr = clrCreateU32(0xFFFFFFFF);
                     else
-                        textColor = clrCreateU32(0xFF00FF00);
+                        textClr = clrCreateU32(0xFF00FF00);
 
                     continue;
                 }
@@ -184,10 +207,10 @@ void drawText(const char *str, tex *target, const font *f, int x, int y, int sz)
 
             case '*':
                 {
-                    if(clrGetColor(textColor) == 0xFF3333FF)
-                        textColor = clrCreateU32(0xFFFFFFFF);
+                    if(clrGetColor(textClr) == 0xFF3333FF)
+                        textClr = clrCreateU32(0xFFFFFFFF);
                     else
-                        textColor = clrCreateU32(0xFF3333FF);
+                        textClr = clrCreateU32(0xFF3333FF);
 
                     continue;
                 }
@@ -195,10 +218,10 @@ void drawText(const char *str, tex *target, const font *f, int x, int y, int sz)
 
             case '#':
                 {
-                    if(clrGetColor(textColor) == 0xFFFFFF00)
-                        textColor = clrCreateU32(0xFFFFFFFF);
+                    if(clrGetColor(textClr) == 0xFFFFFF00)
+                        textClr = clrCreateU32(0xFFFFFFFF);
                     else
-                        textColor = clrCreateU32(0xFFFFFF00);
+                        textClr = clrCreateU32(0xFFFFFF00);
 
                     continue;
                 }
@@ -245,11 +268,30 @@ void drawTextWrap(const char *str, tex *target, const font *f, int x, int y, int
                 break;
 
             j += unitCnt;
-            if(tmpChr == '\n')
+            switch(tmpChr)
             {
-                tmpX = x;
-                y += sz + 8;
-                continue;
+                case '\n':
+                    tmpX = x;
+                    y += sz + 8;
+                    continue;
+                    break;
+
+                case '"':
+                case '#':
+                    if(clrGetColor(textClr) == 0xFFEE9900)
+                        textClr = c;
+                    else
+                        textClr = clrCreateU32(0xFFEE9900);
+                    continue;
+                    break;
+
+                case '*':
+                    if(clrGetColor(textClr) == 0xFF0000FF)
+                        textClr = c;
+                    else
+                        textClr = clrCreateU32(0xFF0000FF);
+                    continue;
+                    break;
             }
 
             FT_GlyphSlot slot = loadGlyph(tmpChr, f, FT_LOAD_RENDER);
@@ -299,9 +341,17 @@ void drawRect(tex *target, int x, int y, int w,  int h, const clr c)
 
     for(int tY = y; tY < y + h; tY++)
     {
+        if(yCheck(target, tY))
+            continue;
+
         uint32_t *rowPtr = &target->data[tY * target->width + x];
         for(int tX = x; tX < x + w; tX++, rowPtr++)
+        {
+            if(xCheck(target, tX))
+                continue;
+
             *rowPtr = clr;
+        }
     }
 }
 
@@ -309,9 +359,17 @@ void drawRectAlpha(tex *target, int x, int y, int w, int h, const clr c)
 {
     for(int tY = y; tY < y + h; tY++)
     {
+        if(yCheck(target, tY))
+            continue;
+
         uint32_t *rowPtr = &target->data[tY * target->width + x];
         for(int tX = x; tX < x + w; tX++, rowPtr++)
+        {
+            if(xCheck(target, tX))
+                continue;
+
             *rowPtr = blend(c, clrCreateU32(*rowPtr));
+        }
     }
 }
 
@@ -509,9 +567,15 @@ void texDraw(const tex *t, tex *target, int x, int y)
         uint32_t *dataPtr = &t->data[0];
         for(int tY = y; tY < y + t->height; tY++)
         {
+            if(yCheck(target, tY))
+                continue;
+
             uint32_t *rowPtr = &target->data[tY * target->width + x];
             for(int tX = x; tX < x + t->width; tX++, rowPtr++)
             {
+                if(xCheck(target, tX))
+                    continue;
+
                 clr dataClr = clrCreateU32(*dataPtr++);
                 clr fbClr   = clrCreateU32(*rowPtr);
 
@@ -528,9 +592,17 @@ void texDrawNoAlpha(const tex *t, tex *target, int x, int y)
         uint32_t *dataPtr = &t->data[0];
         for(int tY = y; tY < y + t->height; tY++)
         {
+            if(yCheck(target, tY))
+                continue;
+
             uint32_t *rowPtr = &target->data[tY * target->width + x];
             for(int tX = x; tX < x + t->width; tX++)
+            {
+                if(xCheck(target, tX))
+                    continue;
+
                 *rowPtr++ = *dataPtr++;
+            }
         }
     }
 }
@@ -542,9 +614,15 @@ void texDrawSkip(const tex *t, tex *target, int x, int y)
         uint32_t *dataPtr = &t->data[0];
         for(int tY = y; tY < y + (t->height / 2); tY++, dataPtr += t->width)
         {
+            if(yCheck(target, tY))
+                continue;
+
             uint32_t *rowPtr = &target->data[tY * target->width + x];
             for(int tX = x; tX < x + (t->width / 2); tX++, rowPtr++)
             {
+                if(xCheck(target, tX))
+                    continue;
+
                 clr px1 = clrCreateU32(*dataPtr++);
                 clr px2 = clrCreateU32(*dataPtr++);
                 clr fbPx = clrCreateU32(*rowPtr);
@@ -562,9 +640,15 @@ void texDrawSkipNoAlpha(const tex *t, tex *target, int x, int y)
         uint32_t *dataPtr = &t->data[0];
         for(int tY = y; tY < y + (t->height / 2); tY++, dataPtr += t->width)
         {
+            if(yCheck(target, tY))
+                continue;
+
             uint32_t *rowPtr = &target->data[tY * target->width + x];
             for(int tX = x; tX < x + (t->width / 2); tX++, rowPtr++)
             {
+                if(xCheck(target, tX))
+                    continue;
+
                 clr px1 = clrCreateU32(*dataPtr++);
                 clr px2 = clrCreateU32(*dataPtr++);
 
@@ -581,9 +665,15 @@ void texDrawInvert(const tex *t, tex *target, int x, int y)
         uint32_t *dataPtr = &t->data[0];
         for(int tY = y; tY < y + t->height; tY++)
         {
+            if(yCheck(target, tY))
+                continue;
+
             uint32_t *rowPtr = &target->data[tY * target->width + x];
             for(int tX = x; tX < x + t->width; tX++, rowPtr++)
             {
+                if(xCheck(target, tX))
+                    continue;
+
                 clr dataClr = clrCreateU32(*dataPtr++);
                 clrInvert(&dataClr);
                 clr fbClr = clrCreateU32(*rowPtr);

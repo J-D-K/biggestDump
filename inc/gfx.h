@@ -40,8 +40,8 @@ bool graphicsInit(int windowWidth, int windowHeight);
 //Exits needed services
 bool graphicsExit();
 
-//Flush, swap buffers
-void gfxHandleBuffs();
+void gfxBeginFrame();
+void gfxEndFrame();
 
 //Creates color from uint32_t
 inline clr clrCreateU32(uint32_t color)
@@ -80,7 +80,7 @@ inline uint32_t clrGetColor(const clr c)
 }
 
 //Draws text using f
-void drawText(const char *str, tex *target, const font *f, int x, int y, int sz);
+void drawText(const char *str, tex *target, const font *f, int x, int y, int sz, clr c);
 
 //Draws text wrapping lines
 void drawTextWrap(const char *str, tex *target, const font *f, int x, int y, int sz, clr c, int maxWidth);

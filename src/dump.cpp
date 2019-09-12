@@ -24,7 +24,7 @@ void dumpThread(void *arg)
     console *c = a->c;
 
     FsFileSystem sys;
-    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, 31, "")))
+    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisStorageId_System, "")))
     {
         fsdevMountDevice("sys", sys);
         c->out("Beginning Update + Firmware dump.");
@@ -56,7 +56,7 @@ void delThread(void *arg)
     console *c = a->c;
 
     FsFileSystem sys;
-    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, 31, "")))
+    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisStorageId_System, "")))
     {
         fsdevMountDevice("sys", sys);
         c->out("Deleting update data from NAND.");

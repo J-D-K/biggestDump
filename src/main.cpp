@@ -14,6 +14,8 @@ font *sysFont;
 
 int main(int argc, const char *argv[])
 {
+    bool dumped = false;
+
     graphicsInit(1280, 720);
     hidInitialize();
 
@@ -49,18 +51,24 @@ int main(int argc, const char *argv[])
         {
             if(down & KEY_A)
             {
-                threadRunning = true;
-                threadFin = false;
+                if(!dumped)
+                {
+                    threadRunning = true, threadFin = false, dumped = true;
 
-                //Struct to send and receive stuff from thread
-                da = dumpArgsCreate(&infoCons, &threadFin);
-                threadCreate(&workThread, dumpThread, da, 0x4000, 0x2B, -2);
-                threadStart(&workThread);
+                    //Struct to send and receive stuff from thread
+                    da = dumpArgsCreate(&infoCons, &threadFin);
+                    threadCreate(&workThread, dumpThread, da, 0x4000, 0x2B, -2);
+                    threadStart(&workThread);
+                }
+                else
+                {
+                    infoCons.out("*UPDATE + FIRMWARE HAS ALREADY BEEN DUMPED! Press + to exit.");
+                    infoCons.nl();
+                }
             }
             else if(down & KEY_X)
             {
-                threadRunning = true;
-                threadFin = false;
+                threadRunning = true, threadFin = false;
                 da = dumpArgsCreate(&infoCons, &threadFin);
                 threadCreate(&workThread, delThread, da, 0x4000, 0x2B, -2);
                 threadStart(&workThread);

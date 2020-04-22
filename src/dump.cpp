@@ -24,7 +24,7 @@ void dumpThread(void *arg)
     console *c = a->c;
 
     FsFileSystem sys;
-    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisStorageId_System, "")))
+    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisPartitionId_System, "")))
     {
         fsdevMountDevice("sys", sys);
         c->out("Beginning Update + Firmware dump.");
@@ -38,7 +38,7 @@ void dumpThread(void *arg)
         copyDirToDir("sys:/Contents/", "sdmc:/Update/", c);
 
         fsdevUnmountDevice("sys");
-        c->out("Update dump finished. Open #sdmc:/Update/# in ChoiDujourNX to update.");
+        c->out("Firmware Update dump finished.");
         c->nl();
     }
     else
@@ -56,7 +56,7 @@ void delThread(void *arg)
     console *c = a->c;
 
     FsFileSystem sys;
-    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisStorageId_System, "")))
+    if(R_SUCCEEDED(fsOpenBisFileSystem(&sys, FsBisPartitionId_System, "")))
     {
         fsdevMountDevice("sys", sys);
         c->out("Deleting update data from NAND.");

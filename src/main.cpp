@@ -10,7 +10,8 @@
 #include "dump.h"
 
 console infoCons(28);
-font *sysFont;
+font *sysFont, *consFont;
+const char *ctrlStr = "\ue0e0 Dump Update   \ue0e2 Delete Update from NAND   \ue0ef Exit";
 
 int main(int argc, const char *argv[])
 {
@@ -18,8 +19,10 @@ int main(int argc, const char *argv[])
 
     graphicsInit(1280, 720);
     hidInitialize();
+    romfsInit();
 
     sysFont = fontLoadSharedFonts();
+    consFont = fontLoadTTF("romfs:/clacon.ttf");
 
     //top
     tex *top = texCreate(1280, 88);
@@ -34,6 +37,8 @@ int main(int argc, const char *argv[])
     //Bot
     texClearColor(bot, clrCreateU32(0xFF2D2D2D));
     drawRect(bot, 30, 0, 1220, 1, clrCreateU32(0xFFFFFFFF));
+    unsigned ctrlX = 1230 - textGetWidth(ctrlStr, sysFont, 18);
+    drawText(ctrlStr, bot, sysFont, ctrlX, 24, 18, clrCreateU32(0xFFFFFFFF));
     infoCons.out("Press A to Dump to #sdmc:/Update/#, X to Erase pending update, Plus to Exit");
     infoCons.nl();
 
@@ -57,7 +62,7 @@ int main(int argc, const char *argv[])
 
                     //Struct to send and receive stuff from thread
                     da = dumpArgsCreate(&infoCons, &threadFin);
-                    threadCreate(&workThread, dumpThread, da, 0x4000, 0x2B, -2);
+                    threadCreate(&workThread, dumpThread, da, NULL, 0x4000, 0x2B, -2);
                     threadStart(&workThread);
                 }
                 else
@@ -70,7 +75,7 @@ int main(int argc, const char *argv[])
             {
                 threadRunning = true, threadFin = false;
                 da = dumpArgsCreate(&infoCons, &threadFin);
-                threadCreate(&workThread, delThread, da, 0x4000, 0x2B, -2);
+                threadCreate(&workThread, delThread, da, NULL, 0x4000, 0x2B, -2);
                 threadStart(&workThread);
             }
             else if(down & KEY_PLUS)
@@ -90,12 +95,14 @@ int main(int argc, const char *argv[])
         texClearColor(frameBuffer, clrCreateU32(0xFF2D2D2D));
         texDrawNoAlpha(top, frameBuffer, 0, 0);
         texDrawNoAlpha(bot, frameBuffer, 0, 648);
-        infoCons.draw(sysFont);
+        infoCons.draw(consFont);
         gfxEndFrame();
     }
 
     hidExit();
+    romfsExit();
     fontDestroy(sysFont);
+    fontDestroy(consFont);
     texDestroy(top);
     texDestroy(bot);
     graphicsExit();

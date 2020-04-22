@@ -38,8 +38,8 @@ INCLUDES	:=	inc
 EXEFS_SRC	:=	exefs_src
 APP_TITLE   :=  biggestDump
 APP_AUTHOR  :=  JK
-APP_VERSION :=  0.0.2
-#ROMFS	    :=	romfs
+APP_VERSION :=  1.0.0
+ROMFS	    :=	romfs
 
 #---------------------------------------------------------------------------------
 # options for code generation

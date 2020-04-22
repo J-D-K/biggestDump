@@ -33,7 +33,7 @@ class console
         {
             mutexLock(&consMutex);
             for(unsigned i = 0; i < lines.size(); i++)
-                drawText(lines[i].c_str(), frameBuffer, f, 56, 98 + (i * 20), 16, clrCreateU32(0xFFFFFFFF));
+                drawText(lines[i].c_str(), frameBuffer, f, 56, 92 + (i * 20), 20, clrCreateU32(0xFFFFFFFF));
             mutexUnlock(&consMutex);
         }
 

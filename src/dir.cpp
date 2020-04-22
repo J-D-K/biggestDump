@@ -1,7 +1,6 @@
 #include <string>
-#include <fstream>
+#include <cstdio>
 #include <vector>
-
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -67,25 +66,25 @@ unsigned dirList::getCount()
 
 void copyFile(const std::string& from, const std::string& to, console *c)
 {
-    std::fstream f(from, std::ios::in | std::ios::binary);
-    std::fstream t(to, std::ios::out | std::ios::binary);
+    FILE *f = fopen(from.c_str(), "rb");
+    FILE *t = fopen(to.c_str(), "wb");
 
-    if(!f.is_open())
+    if(f == NULL)
     {
         c->out(std::string("    *ERROR* Opening #" + from + "# for reading!"));
         c->nl();
         return;
     }
-    else if(!t.is_open())
+    else if(t == NULL)
     {
         c->out(std::string("    *ERROR* Opening #" + to + "# for writing!"));
         c->nl();
         return;
     }
 
-    f.seekg(0, f.end);
-    size_t fileSize = f.tellg();
-    f.seekg(0, f.beg);
+    fseek(f, 0, SEEK_END);
+    size_t fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
     char tmp[32];
     sprintf(tmp, "%luKB.", fileSize / 1024);
@@ -94,29 +93,28 @@ void copyFile(const std::string& from, const std::string& to, console *c)
     uint8_t *buff = new uint8_t[0x80000];
     for(unsigned i = 0; i < fileSize; )
     {
-        size_t tPos = t.tellp();
+        size_t tPos = ftell(t);
 
-        f.read((char *)buff, 0x80000);
-        t.write((char *)buff, f.gcount());
+        size_t fcount = fread(buff, 1, 0x80000, f);
+        fwrite(buff, 1, fcount, t);
 
-        size_t writeSize = (size_t)t.tellp() - tPos;
+        size_t writeSize = ftell(t) - tPos;
 
-        if(writeSize < (unsigned)f.gcount())
+        if(writeSize < fcount)
         {
             char errorMess[128];
-            sprintf(errorMess, "    *ERROR:* Read/Write mismatch. %lu/%lu.", f.gcount(), writeSize);
+            sprintf(errorMess, "    *ERROR:* Read/Write mismatch. %lu/%lu.", fcount, writeSize);
             c->nl();
             c->out(errorMess);
             c->nl();
         }
 
-        i += f.gcount();
+        i += fcount;
     }
 
     delete[] buff;
-
-    f.close();
-    t.close();
+    fclose(f);
+    fclose(t);
 }
 
 void copyDirToDir(const std::string& from, const std::string& to, console *c)

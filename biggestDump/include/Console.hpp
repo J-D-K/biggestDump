@@ -36,6 +36,7 @@ class Console
             SDL::Text::Render(NULL, 56, 94, 20, 1068, {0xFFFFFFFF}, Instance.m_ConsoleText.c_str());
         }
 
+        // Adds and prints text to the console. Always use << "\n" or << Console::NewLine at the end of a line so this works properly.
         Console &operator<<(const char *String)
         {
             std::lock_guard<std::mutex> ConsoleLock(m_ConsoleMutex);
@@ -49,6 +50,11 @@ class Console
             }
             m_ConsoleText += String;
             return *this;
+        }
+
+        Console &operator<<(const std::string &String)
+        {
+            return *this << String.c_str();
         }
 
     private:

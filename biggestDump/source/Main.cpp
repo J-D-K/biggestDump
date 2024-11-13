@@ -1,40 +1,15 @@
 #include "Console.hpp"
 #include "FsLib.hpp"
+#include "IO.hpp"
 #include "SDL.hpp"
-#include <chrono>
+#include "Zip.hpp"
 #include <switch.h>
-#include <thread>
 
 static constexpr SDL::Color CLEAR = {0x2D2D2DFF};
 static constexpr SDL::Color WHITE = {0xFFFFFFFF};
 static constexpr SDL::Color RED = {0xFF0000FF};
 static constexpr SDL::Color GREEN = {0x00FF00FF};
 static constexpr SDL::Color YELLOW = {0xF8FC00FF};
-
-// This is threaded just to be sure everything inside Console works without deadlocks.
-static void PrintDirectory(FsLib::Path DirectoryPath)
-{
-    FsLib::Directory Dir(DirectoryPath);
-    if (!Dir.IsOpen())
-    {
-        return;
-    }
-
-    for (int64_t i = 0; i < Dir.GetEntryCount(); i++)
-    {
-        const char *EntryName = Dir.GetEntryAt(i).data();
-        if (Dir.EntryAtIsDirectory(i))
-        {
-            FsLib::Path NewPath = DirectoryPath + EntryName + "/";
-            PrintDirectory(NewPath);
-        }
-        else
-        {
-            Console::Get() << DirectoryPath.GetFullPath() << EntryName << "\n";
-            //std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        }
-    }
-}
 
 int main(void)
 {
@@ -69,21 +44,24 @@ int main(void)
     }
     else
     {
-        Console::Get() << "Press \uE0E0 to list the files on your system partition until I finish biggestDump tomorrow. It's actually really "
-                          "fast. Don't blink."
+        Console::Get() << "Press \uE0E0 to dump firmware files to to *sdmc:/Firmware/* or \uE0E2 to dump them to *sdmc:/switch/Firmware.zip*."
                        << "\n";
     }
 
-    // To do tomorrow: Get this threading system sorted. I don't like this as it is.
-    std::thread PrintThread;
-    bool ThreadSpawned = false, ThreadRunning = false;
+    std::thread DumpThread;
     while (true)
     {
         padUpdate(&Gamepad);
 
-        if ((padGetButtonsDown(&Gamepad) & HidNpadButton_A) && SystemOpened)
+        if (SystemOpened && (padGetButtonsDown(&Gamepad) & HidNpadButton_A) && FsLib::CreateDirectory("sdmc:/FirmwareDump"))
         {
-            PrintThread = std::thread(PrintDirectory, "system:/");
+            Console::Get() << "Dumping firmware to SD... " << "\n";
+            DumpThread = std::thread(CopyDirectoryToDirectory, "system:/Contents/", "sdmc:/FirmwareDump/");
+        }
+        else if ((padGetButtonsDown(&Gamepad) & HidNpadButton_X) && SystemOpened)
+        {
+            Console::Get() << "Dumping firmware to zip..." << "\n";
+            DumpThread = std::thread(CopyDirectoryToZip, "system:/Contents/", "sdmc:/switch/Firmware.zip");
         }
         else if (padGetButtonsDown(&Gamepad) & HidNpadButton_Plus)
         {

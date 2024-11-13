@@ -61,7 +61,7 @@ LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*
 
 LIBS	:=	../../FsLib/Switch/Fslib/lib/libFsLib.a ../../SDLLib/SDL/lib/libSDL.a \
 			-lSDL2_image `sdl2-config --libs` `freetype-config --libs` \
-			-lnx -lpng -lwebp -ljpeg
+			-lnx -lpng -lwebp -ljpeg -lminizip -lz
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

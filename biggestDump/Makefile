@@ -39,10 +39,10 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	biggestDump
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/AppStates
 DATA		:=	data
 INCLUDES	:=	include ../../FsLib/Switch/FsLib/include ../SDLLib/SDL/include
-#ROMFS	:=	romfs
+ROMFS		:=	romfs
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -60,7 +60,7 @@ ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 LIBS	:=	../../FsLib/Switch/Fslib/lib/libFsLib.a ../../SDLLib/SDL/lib/libSDL.a \
-			-lSDL2_image `sdl2-config --libs` `freetype-config --libs` \
+			-lSDL2_image `sdl2-config --libs` `freetype-config --libs` -ljson-c \
 			-lnx -lpng -lwebp -ljpeg -lminizip -lz
 
 #---------------------------------------------------------------------------------

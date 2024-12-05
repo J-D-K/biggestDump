@@ -1,5 +1,6 @@
 #include "IO.hpp"
 #include "Console.hpp"
+#include "Strings.hpp"
 #include <memory>
 
 namespace
@@ -9,32 +10,34 @@ namespace
 
 void CopyFile(const FsLib::Path &SourcePath, const FsLib::Path &DestinationPath)
 {
-    FsLib::InputFile SourceFile(SourcePath);
-    FsLib::OutputFile DestinationFile(DestinationPath, false);
+    FsLib::File SourceFile(SourcePath, FsOpenMode_Read);
+    FsLib::File DestinationFile(DestinationPath, FsOpenMode_Create | FsOpenMode_Write, SourceFile.GetSize());
+
     if (!SourceFile.IsOpen() || !DestinationFile.IsOpen())
     {
-        Console::Get() << "*" << FsLib::GetErrorString() << "*" << "\n";
+        Console::Printf("*%s*\n", FsLib::GetErrorString());
         return;
     }
 
-    Console::Get() << "Copying " << SourcePath.CString() << " to SD..." << "\n";
+    Console::Printf(Strings::GetByName(Strings::Names::CopyingFile), SourcePath.CString());
     std::unique_ptr<unsigned char[]> FileBuffer(new unsigned char[FILE_BUFFER_SIZE]);
     for (int64_t i = 0; i < SourceFile.GetSize();)
     {
         size_t BytesRead = SourceFile.Read(FileBuffer.get(), FILE_BUFFER_SIZE);
         if (BytesRead == 0)
         {
-            Console::Get() << "*" << FsLib::GetErrorString() << "*" << "\n";
+            Console::Printf("*%s*\n", FsLib::GetErrorString());
             break;
         }
 
         if (DestinationFile.Write(FileBuffer.get(), BytesRead) == 0)
         {
-            Console::Get() << "*" << FsLib::GetErrorString() << "*" << "\n";
+            Console::Printf("*%s*\n", FsLib::GetErrorString());
             break;
         }
         i += BytesRead;
     }
+    Console::Printf(Strings::GetByName(Strings::Names::Done));
 }
 
 void CopyDirectoryToDirectory(const FsLib::Path &Source, const FsLib::Path &Destination)
@@ -42,7 +45,7 @@ void CopyDirectoryToDirectory(const FsLib::Path &Source, const FsLib::Path &Dest
     FsLib::Directory Dir(Source);
     if (!Dir.IsOpen())
     {
-        Console::Get() << FsLib::GetErrorString() << "\n";
+        Console::Printf("*%s*\n", FsLib::GetErrorString());
         return;
     }
 
@@ -50,11 +53,11 @@ void CopyDirectoryToDirectory(const FsLib::Path &Source, const FsLib::Path &Dest
     {
         if (Dir.EntryAtIsDirectory(i))
         {
-            FsLib::Path NewSource = Source + Dir.GetEntryAt(i) + "/";
-            FsLib::Path NewDestination = Destination + Dir.GetEntryAt(i) + "/";
-            if (!FsLib::CreateDirectory(NewDestination.SubPath(NewDestination.GetLength() - 1)))
+            FsLib::Path NewSource = Source / Dir[i];
+            FsLib::Path NewDestination = Destination / Dir[i];
+            if (!FsLib::CreateDirectory(NewDestination))
             {
-                Console::Get() << "*" << FsLib::GetErrorString() << "*" << "\n";
+                Console::Printf("*%s*\n", FsLib::GetErrorString());
                 continue;
             }
 
@@ -62,8 +65,8 @@ void CopyDirectoryToDirectory(const FsLib::Path &Source, const FsLib::Path &Dest
         }
         else
         {
-            FsLib::Path SourcePath = Source + Dir.GetEntryAt(i);
-            FsLib::Path DestinationPath = Destination + Dir.GetEntryAt(i);
+            FsLib::Path SourcePath = Source / Dir[i];
+            FsLib::Path DestinationPath = Destination / Dir[i];
 
             CopyFile(SourcePath, DestinationPath);
         }

@@ -1,3 +1,6 @@
 build/
-*.cbp
-*.layout
+.vscode/
+.clang-format
+.clang-tidy
+.editorconfig
+*.lst

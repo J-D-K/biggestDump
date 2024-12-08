@@ -1,8 +1,8 @@
 {
     "Welcome" : ">欢迎> 使用 biggestDump!\n",
     "Instructions" : "按 [A] 来提取你的系统固件并保存在 <sdmc:/FirmwareDump/<.\n按 [X] 来提取并压缩你的系统固件 <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "复制文件 >%s> 到内存卡... ",
-    "CopyingFileZip" : "复制文件 >%s> 并打包成 ZIP... ",
+    "CopyingFile" : "正在复制文件 >%s> 到内存卡... ",
+    "CopyingFileZip" : "正在复制文件 >%s> 并打包成 ZIP... ",
     "Done" : "已完成!\n",
     "Quit" : "按 [+] 退出该程序。\n"
 }

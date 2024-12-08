@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">歡迎>來到 biggestDump！\n",
-    "Instructions" : "按 [A] 將你的韌體轉存到 <sdmc:/FirmwareDump/<。\n按 [X] 將你的韌體轉存到 <sdmc:/FirmwareDump.zip<。\n",
-    "CopyingFile" : "正在將 >%s> 複製到 sdmc... ",
-    "CopyingFileZip" : "正在將 >%s> 複製到 ZIP... ",
-    "Done" : "完成！\n",
-    "Quit" : "按 [+] 退出。\n"
+    "Welcome" : ">Welcome> to biggestDump!\n",
+    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
+    "CopyingFile" : "Copying >%s> to sdmc... ",
+    "CopyingFileZip" : "Copying >%s> to ZIP... ",
+    "Done" : "Done!\n",
+    "Quit" : "Press [+] to quit.\n"
 }

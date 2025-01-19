@@ -37,12 +37,12 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	biggestDump
+TARGET		:=	SDL_Test
 BUILD		:=	build
-SOURCES		:=	source source/AppStates
+SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=	include libs/FsLib/Switch/FsLib/include libs/SDLLib/SDL/include
-ROMFS		:=	romfs
+INCLUDES	:=	include ../SDL/include
+#ROMFS	:=	romfs
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -50,6 +50,7 @@ ROMFS		:=	romfs
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+			`sdl2-config --cflags` `freetype-config --cflags` \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
@@ -59,9 +60,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:=	../libs/FsLib/Switch/FsLib/lib/libFsLib.a ../libs/SDLLib/SDL/lib/libSDL.a \
-			-lSDL2_image `sdl2-config --libs` `freetype-config --libs` -ljson-c \
-			-lnx -lpng -lwebp -ljpeg -lminizip -lz
+LIBS	:= -lnx ../../SDL/lib/libSDL.a -lSDL2_image `sdl2-config --libs` `freetype-config --libs` -lpng -lwebp -ljpeg
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -157,36 +156,23 @@ ifneq ($(ROMFS),)
 	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: $(BUILD) FsLib SDLLib clean all
+.PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
 
-$(BUILD): FsLib SDLLib
+$(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
-FsLib:
-	$(MAKE) -C libs/FsLib/Switch/FsLib -j
-
-#---------------------------------------------------------------------------------
-SDLLib:
-	$(MAKE) -C libs/SDLLib/SDL -j
-
-#---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	$(MAKE) -C libs/FsLib/Switch/FsLib clean
-	$(MAKE) -C libs/SDLLib/SDL clean
 ifeq ($(strip $(APP_JSON)),)
 	@rm -fr $(BUILD) $(TARGET).nro $(TARGET).nacp $(TARGET).elf
 else
 	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
 endif
-
-send: $(BUILD)
-	@nxlink $(TARGET).nro
 
 
 #---------------------------------------------------------------------------------

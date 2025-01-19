@@ -37,12 +37,12 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	biggestDump
+TARGET		:=	FsLibTest
 BUILD		:=	build
-SOURCES		:=	source source/AppStates
-DATA		:=	data
-INCLUDES	:=	include ../../FsLib/Switch/FsLib/include ../SDLLib/SDL/include
-ROMFS		:=	romfs
+SOURCES		:=	source
+#DATA		:=	data
+INCLUDES	:=	include ../FsLib/include
+#ROMFS	:=	romfs
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -54,14 +54,12 @@ CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=c++23
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:=	../../FsLib/Switch/Fslib/lib/libFsLib.a ../../SDLLib/SDL/lib/libSDL.a \
-			-lSDL2_image `sdl2-config --libs` `freetype-config --libs` -ljson-c \
-			-lnx -lpng -lwebp -ljpeg -lminizip -lz
+LIBS	:= -lnx ../../FsLib/lib/libFsLib.a -lminizip -lz
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -177,7 +175,6 @@ endif
 
 send: $(BUILD)
 	@nxlink $(TARGET).nro
-
 
 #---------------------------------------------------------------------------------
 else

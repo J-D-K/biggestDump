@@ -70,6 +70,20 @@ class Console
                 ++newLineSearch;
             }
 
+            // Check the end of the vaBuffer to see if we need a fake new line
+            size_t vaBufferLength = std::char_traits<char>::length(vaBuffer);
+            if (vaBuffer[vaBufferLength - 1] != '\n')
+            {
+                ++newLineCount;
+                console.m_tempLineAdded = true;
+            }
+            else if (vaBuffer[vaBufferLength - 1] == '\n' && console.m_tempLineAdded)
+            {
+                // Account for the fake new line.
+                --newLineCount;
+                console.m_tempLineAdded = false;
+            }
+
             // Add new lines to count.
             console.m_lineCount += newLineCount;
 
@@ -140,6 +154,8 @@ class Console
         size_t m_bufferSize = 0x1000;
         // Color used to render. Default is white.
         sdl::Color m_renderColor = {0xFFFFFFFF};
+        // This bool might just save the day. This controls whether or not the console has a fake new line at the end so printing works semi-right.
+        bool m_tempLineAdded = false;
         // Console string
         std::string m_consoleString;
 };

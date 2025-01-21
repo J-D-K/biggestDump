@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">Welcome> to biggestDump!\n",
-    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "Copying >%s> to sdmc... ",
-    "CopyingFileZip" : "Copying >%s> to ZIP... ",
-    "Done" : "Done!\n",
-    "Quit" : "Press [+] to quit.\n"
+    "Welcome": ">biggestDumpへようこそ！>\n",
+    "Instructions": "[A]を押してファームウェアを<sdmc:/FirmwareDump/<に保存します。\n[X]を押してファームウェアを<sdmc:/FirmwareDump.zip<に保存します。\n",
+    "CopyingFile": ">%s>をsdmcにコピー中... ",
+    "CopyingFileZip": ">%s>をZIPファイルにコピー中... ",
+    "Done": "完了！\n",
+    "Quit": "[+]を押して終了します。\n"
 }

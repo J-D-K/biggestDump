@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">Welcome> to biggestDump!\n",
-    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "Copying >%s> to sdmc... ",
-    "CopyingFileZip" : "Copying >%s> to ZIP... ",
-    "Done" : "Done!\n",
-    "Quit" : "Press [+] to quit.\n"
+    "Welcome": ">Welcome, old chap,> to biggestDump!\n",
+    "Instructions": "Do kindly press [A] to dump your firmware to <sdmc:/FirmwareDump/<, would you?\nAlternatively, press [X] to dump your firmware to <sdmc:/FirmwareDump.zip<, splendid!\n",
+    "CopyingFile": "Jolly good! Copying >%s> to sdmc... ",
+    "CopyingFileZip": "Smashing effort! Copying >%s> into a ZIP... ",
+    "Done": "Absolutely spiffing, all done!\n",
+    "Quit": "Be a good sport and press [+] to quit, won’t you?\n"
 }

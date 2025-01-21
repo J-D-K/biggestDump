@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">Welcome> to biggestDump!\n",
-    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "Copying >%s> to sdmc... ",
-    "CopyingFileZip" : "Copying >%s> to ZIP... ",
-    "Done" : "Done!\n",
-    "Quit" : "Press [+] to quit.\n"
+    "Welcome": ">biggestDump에 오신 것을 환영합니다!>\n",
+    "Instructions": "[A]를 눌러 펌웨어를 <sdmc:/FirmwareDump/<에 저장하세요.\n[X]를 눌러 펌웨어를 <sdmc:/FirmwareDump.zip<에 저장하세요.\n",
+    "CopyingFile": ">%s>을(를) sdmc로 복사 중... ",
+    "CopyingFileZip": ">%s>을(를) ZIP 파일로 복사 중... ",
+    "Done": "완료!\n",
+    "Quit": "[+]를 눌러 종료하세요.\n"
 }

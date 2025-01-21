@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">Welcome> to biggestDump!\n",
-    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "Copying >%s> to sdmc... ",
-    "CopyingFileZip" : "Copying >%s> to ZIP... ",
-    "Done" : "Done!\n",
-    "Quit" : "Press [+] to quit.\n"
+    "Welcome": ">Добро пожаловать> в biggestDump!\n",
+    "Instructions": "Нажмите [A], чтобы сохранить ваше прошивку в <sdmc:/FirmwareDump/<.\nНажмите [X], чтобы сохранить ваше прошивку в <sdmc:/FirmwareDump.zip<.\n",
+    "CopyingFile": "Копирование >%s> в sdmc... ",
+    "CopyingFileZip": "Копирование >%s> в ZIP-файл... ",
+    "Done": "Готово!\n",
+    "Quit": "Нажмите [+], чтобы выйти.\n"
 }

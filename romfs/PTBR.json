@@ -1,8 +1,8 @@
 {
-    "Welcome" : ">Welcome> to biggestDump!\n",
-    "Instructions" : "Press [A] to dump your firmware to <sdmc:/FirmwareDump/<.\nPress [X] to dump your firmware to <sdmc:/FirmwareDump.zip<.\n",
-    "CopyingFile" : "Copying >%s> to sdmc... ",
-    "CopyingFileZip" : "Copying >%s> to ZIP... ",
-    "Done" : "Done!\n",
-    "Quit" : "Press [+] to quit.\n"
+    "Welcome": ">Bem-vindo> ao biggestDump!\n",
+    "Instructions": "Pressione [A] para salvar o seu firmware em <sdmc:/FirmwareDump/<.\nPressione [X] para salvar o seu firmware em <sdmc:/FirmwareDump.zip<.\n",
+    "CopyingFile": "Copiando >%s> para o sdmc... ",
+    "CopyingFileZip": "Copiando >%s> para o arquivo ZIP... ",
+    "Done": "Concluído!\n",
+    "Quit": "Pressione [+] para sair.\n"
 }

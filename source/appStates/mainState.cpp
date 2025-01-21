@@ -48,24 +48,13 @@ void MainState::update(void)
         }
         BiggestDump::pushState(std::make_shared<ThreadState>(thread::dumpToFolder));
     }
+    else if (input::buttonPressed(HidNpadButton_X) && m_systemMounted)
+    {
+        // I don't think this cares about there being a previous backup.
+        BiggestDump::pushState(std::make_shared<ThreadState>(thread::dumpToZip));
+    }
     else if (input::buttonPressed(HidNpadButton_Plus))
     {
         BiggestDump::quit();
     }
 }
-
-// void MainState::Update(void)
-// {
-//     if ((Input::ButtonPressed(HidNpadButton_A) && m_SystemMounted) && FsLib::CreateDirectory("sdmc:/FirmwareDump"))
-//     {
-//         BiggestDump::PushNewState(std::make_shared<ThreadState>(ThreadFunctions::DumpToFolder));
-//     }
-//     else if (Input::ButtonPressed(HidNpadButton_X) && m_SystemMounted)
-//     {
-//         BiggestDump::PushNewState(std::make_shared<ThreadState>(ThreadFunctions::DumpToZip));
-//     }
-//     else if (Input::ButtonPressed(HidNpadButton_Plus))
-//     {
-//         BiggestDump::Quit();
-//     }
-// }

@@ -1,5 +1,5 @@
 #pragma once
-#include "AppStates/AppState.hpp"
+#include "appStates/appState.hpp"
 
 // This state serves no other purpose than to launch the others and control being able to quit
 class MainState : public AppState
@@ -8,9 +8,9 @@ class MainState : public AppState
         MainState(void);
         ~MainState() {};
 
-        void Update(void);
+        void update(void);
 
     private:
         // Whether or not the system partition was mounted successfully.
-        bool m_SystemMounted = false;
+        bool m_systemMounted = false;
 };

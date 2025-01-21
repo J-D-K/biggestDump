@@ -39,7 +39,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	biggestDump
 BUILD		:=	build
-SOURCES		:=	source source/AppStates
+SOURCES		:=	source source/appStates
 DATA		:=	data
 INCLUDES	:=	include libs/FsLib/Switch/FsLib/include libs/SDLLib/SDL/include
 ROMFS		:=	romfs
